@@ -26,22 +26,24 @@ app.get("/api/hello", function (req, res) {
 });
 
 app.get("/api", function(req,res){
-  res.json({utc:  moment().toDate().toUTCString(),
-  unix: moment().unix()});
+  res.json({utc:  new Date().toUTCString(), //curent time utc
+  unix: Math.floor(Date.now() / 1000)});
 })
 
 app.get("/api/:date?", function(req,res){
   let date= req.params.date;
   if(date.includes('-')){
-    //const dateParsed = new Date(date);
-    if(!moment(date, moment.ISO_8601).isValid()){
+  const dateParsed = new Date(Date.parse(date));
+    if(!dateParsed.getTime()){
       res.json({ error : "Invalid Date" });
   }
-    res.json({unix: moment(req.params.date).unix(),
-    utc: moment(date).toDate().toUTCString()});
+  else{
+    res.json({unix: Math.floor(dateParsed / 1000),
+    utc: dateParsed.toUTCString()});
+  }
   }
   else{
-    let dateTime = new Date(date * 1000).toUTCString();
+    let dateTime = new Date(Math.floor(date / 1000) * 1000).toUTCString();
     var valid = (new Date(dateTime)).getTime() > 0;
     if(valid){
       res.json({
