@@ -26,36 +26,35 @@ app.get("/api/hello", function (req, res) {
 });
 
 app.get("/api", function(req,res){
-  res.json({utc:  new Date().toUTCString(), //curent time utc
-  unix: Math.floor(Date.now() / 1000)});
-})
+  res.json({utc:new Date(), //curent time utc
+  unix: Math.floor(Date.now())});
+});
 
 app.get("/api/:date?", function(req,res){
-  let date= req.params.date;
-  if(date.includes('-')){
-  const dateParsed = new Date(Date.parse(date));
-    if(!dateParsed.getTime()){
-      res.json({ error : "Invalid Date" });
+  let date_string= req.params.date;
+  let date;
+  
+  if (parseInt(date_string) < 10000) {
+    date = new Date(date_string);
   }
-  else{
-    res.json({unix: Math.floor(dateParsed / 1000),
-    utc: dateParsed.toUTCString()});
+  // Create a js date if it is passed in unix format
+  else {
+    date = new Date(parseInt(date_string)); // Set the date in variable
   }
+
+  // Handles if date input is invalid
+  if (date == "Invalid Date") {
+    res.json({ error: "Invalid Date" });
   }
-  else{
-    let dateTime = new Date(Math.floor(date / 1000) * 1000).toUTCString();
-    var valid = (new Date(dateTime)).getTime() > 0;
-    if(valid){
-      res.json({
-        unix: date,
-        utc: dateTime,
-      })
-    }
-    else{
-      res.json({ error : "Invalid Date" });
-    }
+
+  // Handles if date is valid
+  else {
+    res.json({
+      unix: date.valueOf(), // Passes the date in a unix timestamp format
+      utc: date.toUTCString(), // toUTCString is the format the freeCodeCamp test needs to pass
+    });
   }
-})
+});
 
 
 
